@@ -230,7 +230,7 @@ def readCString(f):
     """
     retVal = None
     (firstByte, ) = struct.unpack("B", f.read(1))
-    if firstByte == 0 :
+    if firstByte == 0x0 :
         retVal = "";
     elif firstByte == 0xFF:
         (length, ) = struct.unpack("H", f.read(2))
@@ -281,7 +281,7 @@ def writeLong(f, n):
     f.write(struct.pack("<L", n))
     
 def readFloat(f):
-    """Read float (4 byte?) from a file f."""
+    """Read float (4 bytes) from a file f."""
     (retVal,) = struct.unpack("<f", f.read(4))
     return retVal
 
@@ -299,14 +299,21 @@ def readRepeatEvent(f):
     must be read programatically due to randomness of the data structure
     """
     event = {};
+
+    # Exceptions
     event['dateExceptionCount'] = readShort(f)
     dateExceptions = [];
     for i in range(event['dateExceptionCount']):
         dateExceptions.append(readLong(f))
     if len(dateExceptions) > 0:
         event['dateExceptions'] = dateExceptions
+
+    # Repeating
     event['repeatEventFlag']= readShort(f)
-    if event['repeatEventFlag'] == 0: return event
+    if event['repeatEventFlag'] == 0x0:
+        # No repeat, return.
+        return event
+
     if event['repeatEventFlag'] == 0xFFFF:
         classRecord = {}
         classRecord['constant'] = readShort(f)
@@ -340,11 +347,14 @@ def writeRepeatEvent(f, repeatEventDetails):
         pprint.pprint(repeatEventDetails)
         print '---------------------------------------'
     writeShort(f, repeatEventDetails['dateExceptionCount'])
+
     if repeatEventDetails['dateExceptionCount'] != 0:
         for dateException in repeatEventDetails['dateExceptions']:
             writeLong(f, dateException)
     writeShort(f, repeatEventDetails['repeatEventFlag'])
-    if repeatEventDetails['repeatEventFlag'] == 0: return
+
+    if repeatEventDetails['repeatEventFlag'] == 0x0:
+        return
     if repeatEventDetails['repeatEventFlag'] == 0xFFFF:
         classRecord = repeatEventDetails['classRecord']
         writeShort(f, classRecord['constant'])
@@ -378,7 +388,7 @@ def readField(f, fieldType):
         print 'file:', f
         print 'fieldType:', fieldType
     retVal = None
-    if fieldType ==0: # none
+    if fieldType == 0: # none
         retVal = None
     elif fieldType == 1: # integer
         retVal = readLong(f)
@@ -387,18 +397,18 @@ def readField(f, fieldType):
     elif fieldType == 3: # date
         retVal = readLong(f)
     elif fieldType == 4: # alpha
-        raise NotImplementedError
+        raise NotImplementedError()
     elif fieldType == 5: # cstring
         readLong(f) # padding
         retVal = readCString(f)
     elif fieldType == 6: # boolean
-        retVal = readLong(f) != 0
+        retVal = (readLong(f) != 0)
     elif fieldType == 7: # bit flag
         retVal = readLong(f)
     elif fieldType == 8: # repeat event, bad hack, bad
         retVal = readRepeatEvent(f)
     else:
-        raise ValueError
+        raise ValueError()
     if readDebug:
         import pprint
         pprint.pprint(retVal)
@@ -416,7 +426,7 @@ def writeField(f, fieldType, s):
         print 'fieldType:', fieldType
         print 'value:', s
         print '---------------------------------------'
-    if fieldType ==0: # none
+    if fieldType == 0: # none
         pass
     elif fieldType == 1: # integer
         writeLong(f, s)
@@ -425,7 +435,7 @@ def writeField(f, fieldType, s):
     elif fieldType == 3: # date
         writeLong(f, s)
     elif fieldType == 4: # alpha
-        raise NotImplementedError
+        raise NotImplementedError()
     elif fieldType == 5: # cstring
         writeLong(f, 0) # padding
         writeCString(f, s)
@@ -440,7 +450,7 @@ def writeField(f, fieldType, s):
     elif fieldType == 8: # repeat event, bad hack, bad
         writeRepeatEvent(f, s)
     else:
-        raise ValueError
+        raise ValueError()
 
 def readFRecords(f, fileSoFar, labels):
     """reads a list of frecords from file f
@@ -456,10 +466,12 @@ def readFRecords(f, fileSoFar, labels):
         print 'fileSoFar'
         import pprint
         pprint.pprint(fileSoFar)
+
     fieldsPerRecord = fileSoFar['fieldCount']
     # make sure that declared 
     if fieldsPerRecord != len(labels):
-        raise ValueError
+        raise ValueError()
+
     numberOfRecords = fileSoFar['numEntries'] / fieldsPerRecord;
 #    print "reading", str(numberOfRecords), "records"
     entries = []
@@ -488,8 +500,10 @@ def writeFRecords(f, fieldEntryList, labels, list):
         pprint.pprint(fieldEntryList)
         print '\nlabels'
         pprint.pprint(labels)
+
     if len(fieldEntryList) != len(labels):
-        raise ValueError
+        raise ValueError()
+
     for item in list:
         if writeDebug:
             print '\nitem to write'
@@ -536,7 +550,7 @@ def readRecords(f, fileFormat, howMany=1):
             elif fieldDef[1] == "frecord":
                 entry[fieldDef[0]] = readFRecords(f, entry, eval(fieldDef[2]))
             else:
-                raise AssertionError
+                raise AssertionError()
         retVal.append(entry);
     #    print "returning", str(fileFormat[0])
     return retVal
@@ -579,7 +593,7 @@ def writeRecords(f, fileFormat, list):
                 if writeDebug:
                     print 'BACK FROM WRITING FRECORDS'
             else:
-                raise AssertionError
+                raise AssertionError()
 
 
 ######################
@@ -598,8 +612,8 @@ def readPalmFile(fileName):
     try:
         palmFile = open(fileName, "rb")
     except IOError:
-        print "Palm file", fileName, "cannot be opene\n\n"
-        raise IOError
+        print "Palm file", fileName, "cannot be opened\n\n"
+        raise
     try:
         sig = palmFile.read(4)
         palmFile.seek(0)
@@ -609,11 +623,11 @@ def readPalmFile(fileName):
             fileFormat = calendarHeaderDef
         else:
             print "Unknown file format ", sig
-            raise ValueError        
+            raise ValueError()
         retVal = readRecords(palmFile, fileFormat, 1)
     except IOError:
         print "Unexpected error while reading Palm file"
-        raise IOError
+        raise
     if palmFile : palmFile.close()
     return retVal
 
@@ -638,13 +652,13 @@ def writePalmFile(fileName, fileData):
     sig = struct.pack("L", fileType)
     if not (sig == '\x00\x01BA' or sig == '\x00\x01BD'):
         print "Unknown file format ", sig
-        raise ValueError        
+        raise ValueError()
 
     try:
         palmFile = open(fileName, "wb")
     except IOError:
         print "Palm file", fileName, "cannot be opened\n\n"
-        raise IOError
+        raise
     try:
         #palmFile.write(sig)
         if sig == "\x00\x01BA": # address book
@@ -653,11 +667,11 @@ def writePalmFile(fileName, fileData):
             fileFormat = calendarHeaderDef
         else:
             print "Unknown file format ", sig
-            raise ValueError        
+            raise ValueError()
         writeRecords(palmFile, fileFormat, fileData)
     except IOError:
         print "Unexpected error while writing Palm file"
-        raise IOError
+        raise
     if palmFile : palmFile.close()
 
 def printAllNames(adBook):
