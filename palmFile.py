@@ -248,15 +248,15 @@ def writeCString(f,s):
         print '---------------------------------------'
     length = len(s)
     if length >= 255:
-        format = "=BH" + str(length) + "s"
+        format = "<BH" + str(length) + "s"
         f.write(struct.pack(format,0xFF,int(length),s))
     else:
-        format = "=B" + str(length) + "s"
+        format = "<B" + str(length) + "s"
         f.write(struct.pack(format, int(length), s))
 
 def readShort(f):
     """Read unsigned 2 byte value from a file f."""
-    (retVal,) = struct.unpack("=H", f.read(2))
+    (retVal,) = struct.unpack("<H", f.read(2))
     return retVal
     
 def writeShort(f,n):
@@ -265,11 +265,11 @@ def writeShort(f,n):
         print 'WRITE SHORT'
         print n
         print '---------------------------------------'
-    f.write(struct.pack("=H",n))
+    f.write(struct.pack("<H",n))
 
 def readLong(f):
     """Read unsigned 4 byte value from a file f."""
-    (retVal,) = struct.unpack("=L", f.read(4))
+    (retVal,) = struct.unpack("<L", f.read(4))
     return retVal
 
 def writeLong(f,n):
@@ -278,11 +278,11 @@ def writeLong(f,n):
         print 'WRITE LONG'
         print n
         print '---------------------------------------'
-    f.write(struct.pack("=L",n))
+    f.write(struct.pack("<L",n))
     
 def readFloat(f):
     """Read float (4 byte?) from a file f."""
-    (retVal,) = struct.unpack("=f", f.read(4))
+    (retVal,) = struct.unpack("<f", f.read(4))
     return retVal
 
 def writeFloat(f,n):
@@ -291,7 +291,7 @@ def writeFloat(f,n):
         print 'WRITE FLOAT'
         print n
         print '---------------------------------------'
-    f.write(struct.pack("=f",n))
+    f.write(struct.pack("<f",n))
     
 def readRepeatEvent(f):
     """Read RepeatEvent, a hacky palm data structure
