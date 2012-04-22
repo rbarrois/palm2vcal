@@ -684,14 +684,14 @@ def printAllNames(adBook):
     for address in addresses:
         print address["firstName"], address["lastName"]
 
-def printAWeekWorthOfCalendar(calendar, traceRepeats=False):
+def printCalendar(calendar, days=7, traceRepeats=False):
     """demo of walking the calendar data structure
 
     prints all events a week from now    
     """
     import time 
     print "Your schedule next week:"
-    events = getUpcomingEvents(calendar, 7, traceRepeats)
+    events = getUpcomingEvents(calendar, days, traceRepeats)
     for event in events:
         if event['untimed']:
             print time.strftime("%x ***", time.localtime(event['startTime'])), event['text']
