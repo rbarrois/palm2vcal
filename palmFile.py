@@ -19,7 +19,7 @@ to make sense of the data I get back
 see printAWeekWorthOfCalendar and printAllNames for examples
 
 to write this information back to a file, use
-palmFile.writePalmFile(<fileName>,<fileType>,fileStruct)
+palmFile.writePalmFile(<fileName>, <fileType>, fileStruct)
 """
 
 """
@@ -44,13 +44,13 @@ Date: 03/28/2004
 Added:
     getNextRepeatedEvent(event)
         computes the next occurrence of a repeated event and returns it as an event dictionary
-    printAWeekWorthOfCalendar(calendar,traceRepeats=0)
+    printAWeekWorthOfCalendar(calendar, traceRepeats=False)
         prints to stdout a week's worth of upcoming events.
         if traceRepeats is 1, then this function will also look for upcoming
         occurrences of repeated events
     getEvents(calendar)
         returns a dictionary of events when given a palm datebook fileStruct as calendar
-    getUpcomingEvents(calendar, daysAhead, traceRepeats=0)
+    getUpcomingEvents(calendar, daysAhead, traceRepeats=False)
         returns a list of events from calendar (palm datebook fileStruct) from the present moment
         up to daysAhead number of days into the future. If traceRepeats is 1, then function will
         also look for upcoming occurrences of repeated events.
@@ -239,7 +239,7 @@ def readCString(f):
         retVal = f.read(firstByte)
     return retVal
 
-def writeCString(f,s):
+def writeCString(f, s):
     """Writes string to Palm .dat file"""
     if writeDebug:
         print '---------------------------------------'
@@ -249,7 +249,7 @@ def writeCString(f,s):
     length = len(s)
     if length >= 255:
         format = "<BH" + str(length) + "s"
-        f.write(struct.pack(format,0xFF,int(length),s))
+        f.write(struct.pack(format, 0xFF, int(length), s))
     else:
         format = "<B" + str(length) + "s"
         f.write(struct.pack(format, int(length), s))
@@ -259,39 +259,39 @@ def readShort(f):
     (retVal,) = struct.unpack("<H", f.read(2))
     return retVal
     
-def writeShort(f,n):
+def writeShort(f, n):
     if writeDebug:
         print '---------------------------------------'
         print 'WRITE SHORT'
         print n
         print '---------------------------------------'
-    f.write(struct.pack("<H",n))
+    f.write(struct.pack("<H", n))
 
 def readLong(f):
     """Read unsigned 4 byte value from a file f."""
     (retVal,) = struct.unpack("<L", f.read(4))
     return retVal
 
-def writeLong(f,n):
+def writeLong(f, n):
     if writeDebug:
         print '---------------------------------------'
         print 'WRITE LONG'
         print n
         print '---------------------------------------'
-    f.write(struct.pack("<L",n))
+    f.write(struct.pack("<L", n))
     
 def readFloat(f):
     """Read float (4 byte?) from a file f."""
     (retVal,) = struct.unpack("<f", f.read(4))
     return retVal
 
-def writeFloat(f,n):
+def writeFloat(f, n):
     if writeDebug:
         print '---------------------------------------'
         print 'WRITE FLOAT'
         print n
         print '---------------------------------------'
-    f.write(struct.pack("<f",n))
+    f.write(struct.pack("<f", n))
     
 def readRepeatEvent(f):
     """Read RepeatEvent, a hacky palm data structure
@@ -318,7 +318,7 @@ def readRepeatEvent(f):
     event['interval'] = readLong(f)
     event['endDate'] = readLong(f)
     event['firstDayOfWeek'] = readLong(f)
-    if event['brand'] in (1L,2L,3L):
+    if event['brand'] in (1L, 2L, 3L):
         event['brandDayIndex'] = readLong(f)
     if event['brand'] == 2L:
         event['brandDaysMask'] = f.read(1)
@@ -330,7 +330,7 @@ def readRepeatEvent(f):
         event['brandMonthIndex'] = readLong(f)
     return event
 
-def writeRepeatEvent(f,repeatEventDetails):
+def writeRepeatEvent(f, repeatEventDetails):
     """Write RepeatEvent.
     """
     if writeDebug:
@@ -339,32 +339,32 @@ def writeRepeatEvent(f,repeatEventDetails):
         import pprint
         pprint.pprint(repeatEventDetails)
         print '---------------------------------------'
-    writeShort(f,repeatEventDetails['dateExceptionCount'])
+    writeShort(f, repeatEventDetails['dateExceptionCount'])
     if repeatEventDetails['dateExceptionCount'] != 0:
         for dateException in repeatEventDetails['dateExceptions']:
-            writeLong(f,dateException)
-    writeShort(f,repeatEventDetails['repeatEventFlag'])
+            writeLong(f, dateException)
+    writeShort(f, repeatEventDetails['repeatEventFlag'])
     if repeatEventDetails['repeatEventFlag'] == 0: return
     if repeatEventDetails['repeatEventFlag'] == 0xFFFF:
         classRecord = repeatEventDetails['classRecord']
-        writeShort(f,classRecord['constant'])
-        writeShort(f,classRecord['nameLength'])
+        writeShort(f, classRecord['constant'])
+        writeShort(f, classRecord['nameLength'])
         f.write(classRecord['name'])
 
-    writeLong(f,repeatEventDetails['brand'])
-    writeLong(f,repeatEventDetails['interval'])
-    writeLong(f,repeatEventDetails['endDate'])
-    writeLong(f,repeatEventDetails['firstDayOfWeek'])
-    if repeatEventDetails['brand'] in (1L,2L,3L):
-        writeLong(f,repeatEventDetails['brandDayIndex'])
+    writeLong(f, repeatEventDetails['brand'])
+    writeLong(f, repeatEventDetails['interval'])
+    writeLong(f, repeatEventDetails['endDate'])
+    writeLong(f, repeatEventDetails['firstDayOfWeek'])
+    if repeatEventDetails['brand'] in (1L, 2L, 3L):
+        writeLong(f, repeatEventDetails['brandDayIndex'])
     if repeatEventDetails['brand'] == 2L:
         f.write(repeatEventDetails['brandDaysMask'])
     if repeatEventDetails['brand'] == 3L:
-        writeLong(f,repeatEventDetails['brandWeekIndex'])
+        writeLong(f, repeatEventDetails['brandWeekIndex'])
     if repeatEventDetails['brand'] in (4L, 5L):
-        writeLong(f,repeatEventDetails['brandDayNumber'])
+        writeLong(f, repeatEventDetails['brandDayNumber'])
     if repeatEventDetails['brand'] == 5L:
-        writeLong(f,repeatEventDetails['brandMonthIndex'])
+        writeLong(f, repeatEventDetails['brandMonthIndex'])
     return
     
 def readField(f, fieldType):
@@ -375,8 +375,8 @@ def readField(f, fieldType):
     if readDebug:
         print '-----------------------------------'
         print 'READING FIELD'
-        print 'file:',f
-        print 'fieldType:',fieldType
+        print 'file:', f
+        print 'fieldType:', fieldType
     retVal = None
     if fieldType ==0: # none
         retVal = None
@@ -414,31 +414,31 @@ def writeField(f, fieldType, s):
         print '---------------------------------------'
         print 'WRITING FIELD'
         print 'fieldType:', fieldType
-        print 'value:',s
+        print 'value:', s
         print '---------------------------------------'
     if fieldType ==0: # none
         pass
     elif fieldType == 1: # integer
-        writeLong(f,s)
+        writeLong(f, s)
     elif fieldType == 2: # float
-        writeFloat(f,s)
+        writeFloat(f, s)
     elif fieldType == 3: # date
-        writeLong(f,s)
+        writeLong(f, s)
     elif fieldType == 4: # alpha
         raise NotImplementedError
     elif fieldType == 5: # cstring
-        writeLong(f,0) # padding
-        writeCString(f,s)
+        writeLong(f, 0) # padding
+        writeCString(f, s)
     elif fieldType == 6: # boolean
         if s:
             s = 1
         else:
             s = 0
-        writeLong(f,s)
+        writeLong(f, s)
     elif fieldType == 7: # bit flag
-        writeLong(f,s)
+        writeLong(f, s)
     elif fieldType == 8: # repeat event, bad hack, bad
-        writeRepeatEvent(f,s)
+        writeRepeatEvent(f, s)
     else:
         raise ValueError
 
@@ -499,13 +499,13 @@ def writeFRecords(f, fieldEntryList, labels, list):
             fieldType = fieldEntryList[i]['fieldEntryType']
             if writeDebug:
                 print 'in frecords, attempting to write field:'
-                print 'f:',f
-                print 'fieldType:',fieldType
-                print 'label:',labels[i]
+                print 'f:', f
+                print 'fieldType:', fieldType
+                print 'label:', labels[i]
                 import pprint
                 pprint.pprint(item[labels[i]])
-            writeLong(f,fieldType)
-            writeField(f,fieldType,item[labels[i]])
+            writeLong(f, fieldType)
+            writeField(f, fieldType, item[labels[i]])
 
 def readRecords(f, fileFormat, howMany=1):
     """reads a list of objects from a file f
@@ -569,13 +569,13 @@ def writeRecords(f, fileFormat, list):
             elif fieldDef[1] is "record":
                 if writeDebug:
                     print 'WILL WRITE RECORDS'
-                writeRecords(f=f, fileFormat=eval(fieldDef[2]),list=item[fieldDef[0]])
+                writeRecords(f=f, fileFormat=eval(fieldDef[2]), list=item[fieldDef[0]])
                 if writeDebug:
                     print 'BACK FROM WRITING RECORDS'
             elif fieldDef[1] is "frecord":
                 if writeDebug:
                     print 'WILL WRITE FRECORDS'
-                writeFRecords(f=f, fieldEntryList=item['fieldEntry'],labels=eval(fieldDef[2]), list=item[fieldDef[0]])
+                writeFRecords(f=f, fieldEntryList=item['fieldEntry'], labels=eval(fieldDef[2]), list=item[fieldDef[0]])
                 if writeDebug:
                     print 'BACK FROM WRITING FRECORDS'
             else:
@@ -622,8 +622,8 @@ def writePalmFile(fileName, fileData):
     '''
     if writeDebug:
         print '---------------------------------------'
-        print 'ATTEMPTING TO WRITE PALM FILE\nFILE:',fileName
-        print 'fileType:',fileType
+        print 'ATTEMPTING TO WRITE PALM FILE\nFILE:', fileName
+        print 'fileType:', fileType
         print 'fileData:\n'
         import pprint
         pprint.pprint(fileData)
@@ -635,7 +635,7 @@ def writePalmFile(fileName, fileData):
                 [abHeaderDef | calHeaderDef]
     """
     fileType = fileData[0]['versionTag']
-    sig = struct.pack("L",fileType)
+    sig = struct.pack("L", fileType)
     if not (sig == '\x00\x01BA' or sig == '\x00\x01BD'):
         print "Unknown file format ", sig
         raise ValueError        
@@ -668,27 +668,27 @@ def printAllNames(adBook):
     addressDict = adBook[0]
     addresses = addressDict["addresses"]
     for address in addresses:
-        print address["firstName"],address["lastName"]
+        print address["firstName"], address["lastName"]
 
-def printAWeekWorthOfCalendar(calendar,traceRepeats=0):
+def printAWeekWorthOfCalendar(calendar, traceRepeats=False):
     """demo of walking the calendar data structure
 
     prints all events a week from now    
     """
     import time 
     print "Your schedule next week:"
-    events = getUpcomingEvents(calendar,7,traceRepeats)
+    events = getUpcomingEvents(calendar, 7, traceRepeats)
     for event in events:
         if event['untimed']:
             print time.strftime("%x ***", time.localtime(event['startTime'])), event['text']
         else :
-            print time.strftime("%c-", time.localtime(event['startTime'])), time.strftime("%X", time.localtime(event['endTime'])),event['text']
+            print time.strftime("%c-", time.localtime(event['startTime'])), time.strftime("%X", time.localtime(event['endTime'])), event['text']
         if event['note']: print event['note']
 
 def getEvents(calendar):
     return calendar[0]['datebookList']
 
-def getUpcomingEvents(calendar, daysAhead, traceRepeats=0):
+def getUpcomingEvents(calendar, daysAhead, traceRepeats=False):
     #returns a list of event dictionaries from now until daysAhead days from now
     import time
     calendarDict = calendar[0]
@@ -696,7 +696,7 @@ def getUpcomingEvents(calendar, daysAhead, traceRepeats=0):
     startTime = time.time();
     endTime = startTime + (daysAhead * 60 * 60 * 24) # converts daysAhead to seconds
     retVal = []
-    #print 'Checking for events between',time.localtime(startTime),'and',time.localtime(endTime)
+    #print 'Checking for events between', time.localtime(startTime),'and', time.localtime(endTime)
     for event in dateList:
         newEvent = event.copy()
         if newEvent['startTime'] > startTime and newEvent['startTime'] < endTime:
@@ -706,10 +706,10 @@ def getUpcomingEvents(calendar, daysAhead, traceRepeats=0):
             retVal.append(newEvent.copy())
         if traceRepeats and newEvent['repeatEvent']['repeatEventFlag'] and newEvent['repeatEvent']['endDate'] > startTime:
             newEvent = getNextRepeatedEvent(newEvent)
-            #print 'Looking [',newEvent['text'],'] [',time.localtime(newEvent['startTime']),']'
+            #print 'Looking [', newEvent['text'],'] [', time.localtime(newEvent['startTime']),']'
             while newEvent['startTime'] < startTime:
                 newEvent = getNextRepeatedEvent(newEvent)
-                #print 'Looking [',newEvent['text'],'] [',time.localtime(newEvent['startTime']),']'
+                #print 'Looking [', newEvent['text'],'] [', time.localtime(newEvent['startTime']),']'
             while newEvent['startTime'] <= endTime and newEvent['startTime'] <= newEvent['repeatEvent']['endDate']:
                 #print 'Adding [', newEvent['text'], '] [', time.localtime(newEvent['startTime']), ']'
                 retVal.append(newEvent.copy())
@@ -734,7 +734,7 @@ def getNextRepeatedEvent(event):
         event['startTime'] = event['startTime'] + 60*60*24*repeatDetails['interval']
     elif repeatDetails['brand'] == 2:    # repeat weekly on specific days
         targetDaysMask = ord(repeatDetails['brandDaysMask']) #convert character read from file to ascii code
-        #print 'targetDaysMask:',targetDaysMask
+        #print 'targetDaysMask:', targetDaysMask
         repeatStartLocal=time.localtime(event['startTime'])
         if repeatStartLocal[6] == 5: # event's current start time is a Saturday
             '''add one day to get to Sunday, then add whole weeks
@@ -752,7 +752,7 @@ def getNextRepeatedEvent(event):
         This line converts from the python time_struct to a WDay value with Sunday as 0
         '''
         rsWDay = (repeatStartLocal[6] + 1) % 7
-        #print time.localtime(event['startTime']),'\n\trsWDay:',rsWDay,'\n\t',2**rsWDay,'\n\t',not ((2**rsWDay) & targetDaysMask)
+        #print time.localtime(event['startTime']),'\n\trsWDay:', rsWDay,'\n\t', 2**rsWDay,'\n\t', not ((2**rsWDay) & targetDaysMask)
         while not ((2**rsWDay) & targetDaysMask): # targetDaysMask is sum of the following: 1 = Sunday, 2 = Monday, 4 = Tues, . . . , 64 = Saturday
             event['startTime'] = event['startTime'] + (60*60*24)
             repeatStartLocal=time.localtime(event['startTime'])
@@ -761,12 +761,12 @@ def getNextRepeatedEvent(event):
         from calendar import monthrange
         targetDay = repeatDetails['brandDayIndex'] #returns wday according to Python standards with Monday = 0
         targetWeek = repeatDetails['brandWeekIndex'] #returns week with first week = 0, fourth week = 3, and last week = 4
-        for interval in range(1,repeatDetails['interval'] + 1):
+        for interval in range(1, repeatDetails['interval'] + 1):
             if targetWeek == 4: #event repeats on last ?day of the month.
                 #event['startTime'] = event['startTime'] + (60*60*24*7) #add one week to current event
                 newTime = event['startTime'] + (60*60*24*7*4) #add four weeks to current event
                 newLocalTime = time.localtime(newTime)
-                monthBegins, monthLength = monthrange(newLocalTime[0],newLocalTime[1])
+                monthBegins, monthLength = monthrange(newLocalTime[0], newLocalTime[1])
                 if (monthLength - newLocalTime[3]) >= 7: newTime = newTime + (60*60*24*7)
                 event['startTime'] = newTime
             else: #repeats on 1st - 4th ?day of month
@@ -781,11 +781,11 @@ def getNextRepeatedEvent(event):
     elif repeatDetails['brand'] == 4:
         #repeat monthly based on date
         repeatStartLocal = time.localtime(event['startTime'])
-        event['startTime'] = time.mktime((repeatStartLocal[0],repeatStartLocal[1]+repeatDetails['interval'],repeatStartLocal[2],repeatStartLocal[3],repeatStartLocal[4],repeatStartLocal[5],0,0,0))
+        event['startTime'] = time.mktime((repeatStartLocal[0], repeatStartLocal[1]+repeatDetails['interval'], repeatStartLocal[2], repeatStartLocal[3], repeatStartLocal[4], repeatStartLocal[5], 0, 0, 0))
     elif repeatDetails['brand'] == 5:
         #repeat yearly based on date
         repeatStartLocal = time.localtime(event['startTime'])
-        event['startTime'] = time.mktime((repeatStartLocal[0]+repeatDetails['interval'],repeatStartLocal[1],repeatStartLocal[2],repeatStartLocal[3],repeatStartLocal[4],repeatStartLocal[5],0,0,0))
+        event['startTime'] = time.mktime((repeatStartLocal[0]+repeatDetails['interval'], repeatStartLocal[1], repeatStartLocal[2], repeatStartLocal[3], repeatStartLocal[4], repeatStartLocal[5], 0, 0, 0))
     
     newEventDST = time.localtime(event['startTime'])[8]
     correctDST = repeatStartDST - newEventDST
