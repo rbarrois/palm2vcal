@@ -614,6 +614,14 @@ def readPalmFile(fileName):
     except IOError:
         print "Palm file", fileName, "cannot be opened\n\n"
         raise
+
+    try:
+        result = readPalmFileObject(palmFile)
+    finally:
+        palmFile.close()
+    return result
+
+def readPalmFileObject(file_obj):
     try:
         sig = palmFile.read(4)
         palmFile.seek(0)
@@ -628,7 +636,6 @@ def readPalmFile(fileName):
     except IOError:
         print "Unexpected error while reading Palm file"
         raise
-    if palmFile : palmFile.close()
     return retVal
 
 def writePalmFile(fileName, fileData):
