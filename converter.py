@@ -130,13 +130,15 @@ class PalmFile(object):
             recur['freq'] = 'monthly'
             # Day in the month
             recur['bymonthday'] = repeat['brandDayNumber']
+
         elif repeat['brand'] == 5:
             # yearly, by date
             recur['freq'] = 'yearly'
             # Day in the month
             recur['bymonthday'] = repeat['brandDayNumber']
             # Month in the year
-            recur['bymonth'] = repeat['brandMonthIndex']
+            recur['bymonth'] = repeat['brandMonthIndex'] + 1
+
         elif repeat['brand'] == 6:
             # yearly, by day
             recur['freq'] = 'yearly'
