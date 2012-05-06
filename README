@@ -4,8 +4,8 @@ palm2vcal
 This package provides a script converting palm OS .dba calendar files into standard .ics vCalendar files.
 If requested, the other direction could be easily introduced.
 
-It relies mostly on the `palmFile.py <http://www.totic.org/develop/palmFile.py>` script written by Aleks Totić, and improved by Jeff Mikels.
-In order to generate the vcalendar file, this script uses the `icalendar <http://pypi.python.org/pypi/icalendar>` package.
+It relies mostly on the `palmFile.py <http://www.totic.org/develop/palmFile.py>`_ script written by Aleks Totić, and improved by Jeff Mikels.
+In order to generate the vcalendar file, this script uses the `icalendar <http://pypi.python.org/pypi/icalendar>`_ package.
 
 
 Usage
@@ -23,7 +23,7 @@ When using the ``--verbose`` option, the number of converted event is printed to
 Encoding
 --------
 
-The target file will be written in UTF8, as per `RFC5545 <http://tools.ietf.org/html/rfc5545>`.
+The target file will be written in UTF8, as per `RFC5545 <http://tools.ietf.org/html/rfc5545>`_.
 
 The encoding of the input file defaults to cp1252 (microsoft standard encoding), but another encoding can
 be chosen using the ``--encoding`` switch::
@@ -39,5 +39,5 @@ Links
 - icalendar documentation: `http://readthedocs.org/docs/icalendar/en/latest/`
 - vcal format RFC: `http://tools.ietf.org/html/rfc5545`
 - Package on PyPI: `http://pypi.python.org/pypi/palm2vcal/`
-- Issues and code on `github <http://github.com>`: `http://github.com/rbarrois/palm2vcal`
+- Issues and code on `GitHub <http://github.com>`_: `http://github.com/rbarrois/palm2vcal`
 
