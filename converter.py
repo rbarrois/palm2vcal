@@ -100,7 +100,7 @@ class PalmFile(object):
             # Daily
             recur['freq'] = 'daily'
             # Repeat every sth day of the week
-            recur['byday'] = self.DAY_NAMES[repeat['brandDayIndex']]
+            recur['byday'] = [self.DAY_NAMES[repeat['brandDayIndex']]]
         elif repeat['brand'] == 2:
             # weekly
             recur['freq'] = 'weekly'
@@ -108,15 +108,17 @@ class PalmFile(object):
             # 1 => Sunday, 2 => Monday, 4 => Tuesday, 64 => Saturday
             days_mask = ord(repeat['brandDaysMask'])
             for day_mask, day in self.DAYMASK_TRANSLATION.items():
+                days = []
                 if days_mask & day_mask:
-                    # icalendar doesn't support multiples byday
-                    recur['byday'] = day
+                    days.append(day)
+                if days:
+                    recur['byday'] = days
 
         elif repeat['brand'] == 3:
             # monthly, by day
             recur['freq'] = 'monthly'
             # Day of the week
-            recur['byday'] = self.DAY_NAMES[repeat['brandDayIndex']]
+            recur['byday'] = [self.DAY_NAMES[repeat['brandDayIndex']]]
             # Week of the month
             if repeat['brandWeekIndex'] == 4:
                 # Last week of the month
