@@ -9,6 +9,17 @@ import palmFile
 from palm2vcal import __version__
 
 class Palm2vCalConverter(object):
+    """Convert a .dba file into a .ics dict.
+
+    Attributes:
+        src_file: file object, source file to read from
+        src_encoding: the encoding to use when reading text from the source
+            file
+        categories: dict mapping a category index to its (long) name
+        events: list of icalendar.vEvent
+        raw_data: raw data returned by palmFile.
+    """
+
     DAYMASK_TRANSLATION = {
         1: 'SU',
         2: 'MO',
@@ -37,6 +48,7 @@ class Palm2vCalConverter(object):
         self.raw_data = None
 
     def export(self, dst_file):
+        """Export events to a file object."""
         if not self.events:
             self.import_file()
         vcal = icalendar.Calendar()
@@ -49,12 +61,25 @@ class Palm2vCalConverter(object):
         dst_file.write(vcal.to_ical())
 
     def clean(self, value):
+        """Clean input data read from the source file.
+
+        Currently converts to unicode with adequate encoding.
+        """
         if isinstance(value, basestring):
             return unicode(value, self.src_encoding)
         else:
             return value
 
     def mkdate(self, ts, as_date=False):
+        """Make a date from a timestamp.
+
+        Timezone handling should occur here.
+
+        Args:
+            ts: int, the timestamp to convert
+            as_date: bool, whether to return a datetime.datetime or a
+                datetime.date
+        """
         dt = datetime.datetime.fromtimestamp(ts)
         if as_date:
             return datetime.date(dt.year, dt.month, dt.day)
@@ -62,6 +87,7 @@ class Palm2vCalConverter(object):
             return dt
 
     def import_file(self):
+        """Perform the actual source file parsing."""
         self.raw_data = palmFile.readPalmFileObject(self.src_file)[0]
         for category in self.raw_data['categoryList']:
             self.categories[category['index']] = self.clean(category['longName'])
