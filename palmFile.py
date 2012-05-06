@@ -521,7 +521,7 @@ def writeFRecords(f, fieldEntryList, labels, list):
             writeLong(f, fieldType)
             writeField(f, fieldType, item[labels[i]])
 
-def readRecords(f, fileFormat, howMany=1):
+def readRecords(f, fileFormat, howMany=1, versionTag=None):
     """reads a list of objects from a file f
     
     fileFormat -- HEADERDEF of what format looks like
@@ -539,7 +539,9 @@ def readRecords(f, fileFormat, howMany=1):
             pprint.pprint(retVal)
         entry = {}
         for fieldDef in fileFormat:
-            if fieldDef[1] == "long":
+            if fieldDef[0] == "versionTag" and versionTag is not None:
+                entry[fieldDef[0]] = versionTag
+            elif fieldDef[1] == "long":
                 entry[fieldDef[0]] = readLong(f)
             elif fieldDef[1] == "short":
                 entry[fieldDef[0]] = readShort(f)
@@ -623,8 +625,8 @@ def readPalmFile(fileName):
 
 def readPalmFileObject(file_obj):
     try:
-        sig = palmFile.read(4)
-        palmFile.seek(0)
+        sig = file_obj.read(4)
+#        file_obj.seek(0)
         if sig == "\x00\x01BA": # address book
             fileFormat = addressHeaderDef 
         elif sig == "\x00\x01BD": # datebook (calendar)
@@ -632,7 +634,7 @@ def readPalmFileObject(file_obj):
         else:
             print "Unknown file format ", sig
             raise ValueError()
-        retVal = readRecords(palmFile, fileFormat, 1)
+        retVal = readRecords(file_obj, fileFormat, 1, versionTag=sig)
     except IOError:
         print "Unexpected error while reading Palm file"
         raise
