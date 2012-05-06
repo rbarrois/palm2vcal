@@ -34,10 +34,10 @@ be chosen using the ``--encoding`` switch::
 Links
 -----
 
-- Original ``palmFile.py``: `http://www.totic.org/develop/palmFile.py`
-- Palm file format specification: `http://www.notsofaqs.com/datebook_dat.php`
-- icalendar documentation: `http://readthedocs.org/docs/icalendar/en/latest/`
-- vcal format RFC: `http://tools.ietf.org/html/rfc5545`
-- Package on PyPI: `http://pypi.python.org/pypi/palm2vcal/`
-- Issues and code on `GitHub <http://github.com>`_: `http://github.com/rbarrois/palm2vcal`
+- Original ``palmFile.py``: `http://www.totic.org/develop/palmFile.py`_
+- Palm file format specification: `http://www.notsofaqs.com/datebook_dat.php`_
+- icalendar documentation: `http://readthedocs.org/docs/icalendar/en/latest/`_
+- vcal format RFC: `http://tools.ietf.org/html/rfc5545`_
+- Package on PyPI: `http://pypi.python.org/pypi/palm2vcal/`_
+- Issues and code on `GitHub <http://github.com>`_: `http://github.com/rbarrois/palm2vcal`_
 
