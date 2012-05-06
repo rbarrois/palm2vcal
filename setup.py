@@ -17,10 +17,16 @@ def get_version():
     return '0.0'
 
 
+def readfile(filename):
+    with open(filename, 'r') as f:
+        return f.read()
+
+
 setup(
     name='palm2vcal',
     version=get_version(),
     description="Convert PalmOS .dba calendar to a vcalendar file.",
+    long_description=readfile('README'),
     author='Raphaël Barrois',
     author_email='raphael.barrois@polytechnique.org',
     url='http://github.com/rbarrois/palm2vcal',
