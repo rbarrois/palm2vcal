@@ -34,7 +34,7 @@ setup(
     keywords=['palm', 'calendar', 'conversion', 'vcalendar', 'ics'],
     packages=['palm2vcal'],
     scripts=['bin/palm2vcal'],
-    license='MIT',
+    license='GPL',
     requires=[
         'icalendar',
     ],
@@ -42,6 +42,7 @@ setup(
         'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Intended Audience :: End Users/Desktop',
+        'License :: OSI Approved :: GNU General Public License (GPL)',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Topic :: Office/Business :: Scheduling',
