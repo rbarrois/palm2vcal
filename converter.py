@@ -2,12 +2,16 @@
 # coding: utf-8
 
 import datetime
+import optparse
+import sys
 
 import icalendar
 import palmFile
 
+#from . import __version__
+__version__ = '0.1'
 
-class PalmFile(object):
+class Palm2vCalConverter(object):
     DAYMASK_TRANSLATION = {
         1: 'SU',
         2: 'MO',
@@ -28,25 +32,24 @@ class PalmFile(object):
         6: 'SU',
     }
 
-    def __init__(self, filename, src_encoding='latin1'):
-        self.filename = filename
+    def __init__(self, src_file, src_encoding='cp1252'):
+        self.src_file = src_file
         self.src_encoding = src_encoding
         self.categories = {}
         self.events = []
         self.raw_data = None
 
-    def export(self, filename):
+    def export(self, dst_file):
         if not self.events:
             self.import_file()
         vcal = icalendar.Calendar()
-        vcal.add('prodid', "Xelnext palm2iCal converter")
-        vcal.add('version', '0.1')
+        vcal.add('prodid', "Xelnext palm2vCal converter")
+        vcal.add('version', __version__)
 
         for e in self.events:
             vcal.add_component(e)
 
-        with open(filename, 'w') as f:
-            f.write(vcal.to_ical())
+        dst_file.write(vcal.to_ical())
 
     def clean(self, value):
         if isinstance(value, basestring):
@@ -62,7 +65,7 @@ class PalmFile(object):
             return dt
 
     def import_file(self):
-        self.raw_data = palmFile.readPalmFile(self.filename)[0]
+        self.raw_data = palmFile.readPalmFileObject(self.src_file)[0]
         for category in self.raw_data['categoryList']:
             self.categories[category['index']] = self.clean(category['longName'])
 
@@ -146,3 +149,64 @@ class PalmFile(object):
         event['rrule'] = recur
 
         return event
+
+
+def main(argv):
+    usage = """usage: %prog [options] [from_file [to_file]]
+
+Parse file <from_file> and write it to <to_file>.
+If <to_file> is either '-' or omitted, %prog will write to stdout.
+If <from_file> is either '-' or omitted, %prog will read from stdin.
+"""
+    parser = optparse.OptionParser(usage=usage, version=__version__)
+    parser.add_option('-e', '--encoding', dest='encoding', default='cp1252',
+        help="Read input with ENCODING encoding")
+    parser.add_option('-v', '--verbose', dest='verbose', default=False,
+        action='store_true', help="More verbose messages.")
+
+    opts, args = parser.parse_args()
+
+    if len(args) > 2:
+        parser.error("At most 2 arguments are allowed, from and to.")
+
+    if len(args) == 2:
+        src, dst = args
+    elif len(args) == 1:
+        # Assume output do stdout
+        src, dst = args[0], '-'
+    else:
+        src, dst = '-', '-'
+
+    if src == '-':
+        src_file = sys.stdin
+    else:
+        src_file = open(src, 'rb')
+
+    try:
+        conv = Palm2vCalConverter(src_file, src_encoding=opts.encoding)
+        conv.import_file()
+    finally:
+        if src != '-':
+            src_file.close()
+
+    if dst == '-':
+        dst_file = sys.stdout
+    else:
+        dst_file = open(dst, 'wb')
+
+    try:
+        conv.export(dst_file)
+    finally:
+        if dst != '-':
+            dst_file.close()
+
+    if opts.verbose:
+        logfile = sys.stderr if dst == '-' else sys.stdout
+        srcfname = 'stdin' if src == '-' else '%r' % src
+        dstfname = 'stdout' if dst == '-' else '%r' % dst
+        logfile.write("Written %d events from %s to %s.\n" %
+            (len(conv.events), srcfname, dstfname))
+
+
+if __name__ == '__main__':
+    main(sys.argv)
