@@ -6,6 +6,7 @@ import optparse
 import sys
 
 import palm2vcal
+from palm2vcal import converter
 
 
 def main(argv):
@@ -40,7 +41,7 @@ If <from_file> is either '-' or omitted, %prog will read from stdin.
         src_file = open(src, 'rb')
 
     try:
-        conv = palm2vcal.Palm2vCalConverter(src_file, src_encoding=opts.encoding)
+        conv = converter.Palm2vCalConverter(src_file, src_encoding=opts.encoding)
         conv.import_file()
     finally:
         if src != '-':
